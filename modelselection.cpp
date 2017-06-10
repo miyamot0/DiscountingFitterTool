@@ -189,6 +189,7 @@ void ModelSelection::FitNoise()
 {
     N = y.length();
     AVE = 0;
+    sumErr = 0;
 
     for (int i = 0; i < N; i++)
     {
@@ -200,10 +201,12 @@ void ModelSelection::FitNoise()
 
     for (int i = 0; i < N; i++)
     {
+    	sumErr += ((double) y[i] - AVE);
         SSR += pow(((double) y[i] - AVE), 2);
     }
 
     S2 = SSR / N;
+    sumErr = sumErr / N;
 
     L = pow((1.0 / sqrt(2 * M_PI * S2)), N) * exp(-SSR / (S2 * 2.0));
 

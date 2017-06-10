@@ -148,6 +148,10 @@ public:
     double fitRachlinS;
 
     double AVE;
+    double SSR;
+    double sumErr;
+    double N;
+    double S2;
 
 private:
     real_2d_array x;
@@ -168,9 +172,6 @@ private:
     /** BIC Stuff
       *
       */
-    double SSR;
-    double N;
-    double S2;
     double L;
     double DF;
     double PROJ;

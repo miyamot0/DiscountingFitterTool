@@ -201,8 +201,8 @@ int main(int argc, char *argv[])
     mFitter.FitNoise();
 
     out << "\"NoiseMean\":" << mFitter.AVE << ",";
-    out << "\"NoiseRMS\":" << mFitter.GetReport().rmserror << ",";
-    out << "\"Noiseavgerr\":" << mFitter.GetReport().rmserror << ",";
+    out << "\"NoiseRMS\":" << sqrt(mFitter.S2) << ",";
+    out << "\"Noiseavgerr\":" << mFitter.sumErr << ",";
     out << "\"NoiseBIC\":" << mFitter.bicNoise << ",";
     out << "\"NoiseAIC\":" << mFitter.aicNoise << ",";
     out << "\"NoiseCode\":" << (int) mFitter.GetInfo() << ",";
