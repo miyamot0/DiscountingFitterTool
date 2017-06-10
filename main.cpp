@@ -61,63 +61,153 @@ int main(int argc, char *argv[])
     std::ostringstream out;
     out << "{";
 
+    /*
+     * Hyperbolic
+     */
     mFitter.FitHyperbolic("[0.3]");
 
-    out << "\"Hyperbolic\":" << mFitter.fitHyperbolicK << ",";
-    out << "\"HyperbolicRMS\":" << mFitter.GetReport().rmserror << ",";
-    out << "\"HyperbolicBIC\":" << mFitter.bicHyperbolic << ",";
-    out << "\"HyperbolicAIC\":" << mFitter.aicHyperbolic << ",";
-    out << "\"HyperbolicCode\":" << (int) mFitter.GetInfo() << ",";
+    if ((int) mFitter.GetInfo() == 2 || (int) mFitter.GetInfo() == 5)
+    {
+        out << "\"Hyperbolic\":" << mFitter.fitHyperbolicK << ",";
+        out << "\"HyperbolicRMS\":" << mFitter.GetReport().rmserror << ",";
+        out << "\"Hyperbolicavgerr\":" << mFitter.GetReport().avgerror << ",";
+        out << "\"HyperbolicBIC\":" << mFitter.bicHyperbolic << ",";
+        out << "\"HyperbolicAIC\":" << mFitter.aicHyperbolic << ",";
+        out << "\"HyperbolicCode\":" << (int) mFitter.GetInfo() << ",";
 
+        mFitter.mBicList.push_back(std::pair<std::string, double>("Hyperbolic", mFitter.bicHyperbolic));
+    }
+    else
+    {
+        out << "\"Hyperbolic\":" << "\"\"" << ",";
+        out << "\"HyperbolicRMS\":" << "\"\"" << ",";
+        out << "\"Hyperbolicavgerr\":" << "\"\"" << ",";
+        out << "\"HyperbolicBIC\":" << "\"\"" << ",";
+        out << "\"HyperbolicAIC\":" << "\"\"" << ",";
+        out << "\"HyperbolicCode\":" << (int) mFitter.GetInfo() << ",";
+    }
+
+    /*
+     * Exponential
+     */
     mFitter.FitExponential("[0.3]");
 
-    out << "\"Exponential\":" << mFitter.fitExponentialK << ",";
-    out << "\"ExponentialRMS\":" << mFitter.GetReport().rmserror << ",";
-    out << "\"ExponentialBIC\":" << mFitter.bicExponential << ",";
-    out << "\"ExponentialAIC\":" << mFitter.aicExponential << ",";
-    out << "\"ExponentialCode\":" << (int) mFitter.GetInfo() << ",";
+    if ((int) mFitter.GetInfo() == 2 || (int) mFitter.GetInfo() == 5)
+    {
+        out << "\"Exponential\":" << mFitter.fitExponentialK << ",";
+        out << "\"ExponentialRMS\":" << mFitter.GetReport().rmserror << ",";
+        out << "\"Exponentialavgerr\":" << mFitter.GetReport().avgerror << ",";
+        out << "\"ExponentialBIC\":" << mFitter.bicExponential << ",";
+        out << "\"ExponentialAIC\":" << mFitter.aicExponential << ",";
+        out << "\"ExponentialCode\":" << (int) mFitter.GetInfo() << ",";
 
+        mFitter.mBicList.push_back(std::pair<std::string, double>("Exponential", mFitter.bicExponential));
+    }
+    else
+    {
+        out << "\"Exponential\":" << "\"\"" << ",";
+        out << "\"ExponentialRMS\":" << "\"\"" << ",";
+        out << "\"Exponentialavgerr\":" << "\"\"" << ",";
+        out << "\"ExponentialBIC\":" << "\"\"" << ",";
+        out << "\"ExponentialAIC\":" << "\"\"" << ",";
+        out << "\"ExponentialCode\":" << (int) mFitter.GetInfo() << ",";
+    }
+
+
+    /*
+     * Beta Delta
+     */
     mFitter.FitQuasiHyperbolic("[0.3, 0.3]");
 
-    out << "\"QuasiHyperbolicBeta\":" << mFitter.fitQuasiHyperbolicBeta << ",";
-    out << "\"QuasiHyperbolicDelta\":" << mFitter.fitQuasiHyperbolicDelta << ",";
-    out << "\"QuasiHyperbolicRMS\":" << mFitter.GetReport().rmserror << ",";
-    out << "\"QuasiHyperbolicBIC\":" << mFitter.bicQuasiHyperbolic << ",";
-    out << "\"QuasiHyperbolicAIC\":" << mFitter.aicQuasiHyperbolic << ",";
-    out << "\"QuasiHyperbolicCode\":" << (int) mFitter.GetInfo() << ",";
+    if ((int) mFitter.GetInfo() == 2 || (int) mFitter.GetInfo() == 5)
+    {
+        out << "\"QuasiHyperbolicBeta\":" << mFitter.fitQuasiHyperbolicBeta << ",";
+        out << "\"QuasiHyperbolicDelta\":" << mFitter.fitQuasiHyperbolicDelta << ",";
+        out << "\"QuasiHyperbolicRMS\":" << mFitter.GetReport().rmserror << ",";
+        out << "\"QuasiHyperbolicavgerr\":" << mFitter.GetReport().avgerror << ",";
+        out << "\"QuasiHyperbolicBIC\":" << mFitter.bicQuasiHyperbolic << ",";
+        out << "\"QuasiHyperbolicAIC\":" << mFitter.aicQuasiHyperbolic << ",";
+        out << "\"QuasiHyperbolicCode\":" << (int) mFitter.GetInfo() << ",";
 
+        mFitter.mBicList.push_back(std::pair<std::string, double>("Beta Delta", mFitter.bicQuasiHyperbolic));
+    }
+    else
+    {
+        out << "\"QuasiHyperbolicBeta\":" << "\"\"" << ",";
+        out << "\"QuasiHyperbolicDelta\":" << "\"\"" << ",";
+        out << "\"QuasiHyperbolicRMS\":" << "\"\"" << ",";
+        out << "\"QuasiHyperbolicavgerr\":" << "\"\"" << ",";
+        out << "\"QuasiHyperbolicBIC\":" << "\"\"" << ",";
+        out << "\"QuasiHyperbolicAIC\":" << "\"\"" << ",";
+        out << "\"QuasiHyperbolicCode\":" << (int) mFitter.GetInfo() << ",";
+    }
+
+    /*
+     * Myerson Green
+     */
     mFitter.FitMyerson("[0.3, 0.3]");
 
-    out << "\"MyersonK\":" << mFitter.fitMyersonK << ",";
-    out << "\"MyersonS\":" << mFitter.fitMyersonS << ",";
-    out << "\"MyersonRMS\":" << mFitter.GetReport().rmserror << ",";
-    out << "\"MyersonBIC\":" << mFitter.bicMyerson << ",";
-    out << "\"MyersonAIC\":" << mFitter.aicMyerson << ",";
-    out << "\"MyersonCode\":" << (int) mFitter.GetInfo() << ",";
+    if ((int) mFitter.GetInfo() == 2 || (int) mFitter.GetInfo() == 5)
+    {
+        out << "\"MyersonK\":" << mFitter.fitMyersonK << ",";
+        out << "\"MyersonS\":" << mFitter.fitMyersonS << ",";
+        out << "\"MyersonRMS\":" << mFitter.GetReport().rmserror << ",";
+        out << "\"Myersonavgerr\":" << mFitter.GetReport().avgerror << ",";
+        out << "\"MyersonBIC\":" << mFitter.bicMyerson << ",";
+        out << "\"MyersonAIC\":" << mFitter.aicMyerson << ",";
+        out << "\"MyersonCode\":" << (int) mFitter.GetInfo() << ",";
 
+        mFitter.mBicList.push_back(std::pair<std::string, double>("Myerson", mFitter.bicMyerson));
+    }
+    else
+    {
+        out << "\"MyersonK\":" << "\"\"" << ",";
+        out << "\"MyersonS\":" << "\"\"" << ",";
+        out << "\"MyersonRMS\":" << "\"\"" << ",";
+        out << "\"Myersonavgerr\":" << "\"\"" << ",";
+        out << "\"MyersonBIC\":" << "\"\"" << ",";
+        out << "\"MyersonAIC\":" << "\"\"" << ",";
+        out << "\"MyersonCode\":" << (int) mFitter.GetInfo() << ",";
+    }
+
+    /*
+     * Rachlin
+     */
     mFitter.FitRachlin("[0.3, 0.3]");
 
-    out << "\"RachlinK\":" << mFitter.fitRachlinK << ",";
-    out << "\"RachlinS\":" << mFitter.fitRachlinS << ",";
-    out << "\"RachlinRMS\":" << mFitter.GetReport().rmserror << ",";
-    out << "\"RachlinBIC\":" << mFitter.bicRachlin << ",";
-    out << "\"RachlinAIC\":" << mFitter.aicRachlin << ",";
-    out << "\"RachlinCode\":" << (int) mFitter.GetInfo() << ",";
+    if ((int) mFitter.GetInfo() == 2 || (int) mFitter.GetInfo() == 5)
+    {
+        out << "\"RachlinK\":" << mFitter.fitRachlinK << ",";
+        out << "\"RachlinS\":" << mFitter.fitRachlinS << ",";
+        out << "\"RachlinRMS\":" << mFitter.GetReport().rmserror << ",";
+        out << "\"Rachlinavgerr\":" << mFitter.GetReport().avgerror << ",";
+        out << "\"RachlinBIC\":" << mFitter.bicRachlin << ",";
+        out << "\"RachlinAIC\":" << mFitter.aicRachlin << ",";
+        out << "\"RachlinCode\":" << (int) mFitter.GetInfo() << ",";
+
+        mFitter.mBicList.push_back(std::pair<std::string, double>("Rachlin", mFitter.bicRachlin));
+    }
+    else
+    {
+        out << "\"RachlinK\":" << "\"\"" << ",";
+        out << "\"RachlinS\":" << "\"\"" << ",";
+        out << "\"RachlinRMS\":" << "\"\"" << ",";
+        out << "\"Rachlinavgerr\":" << "\"\"" << ",";
+        out << "\"RachlinBIC\":" << "\"\"" << ",";
+        out << "\"RachlinAIC\":" << "\"\"" << ",";
+        out << "\"RachlinCode\":" << (int) mFitter.GetInfo() << ",";
+    }
 
     mFitter.FitNoise();
 
     out << "\"NoiseMean\":" << mFitter.AVE << ",";
     out << "\"NoiseRMS\":" << mFitter.GetReport().rmserror << ",";
+    out << "\"Noiseavgerr\":" << mFitter.GetReport().rmserror << ",";
     out << "\"NoiseBIC\":" << mFitter.bicNoise << ",";
     out << "\"NoiseAIC\":" << mFitter.aicNoise << ",";
     out << "\"NoiseCode\":" << (int) mFitter.GetInfo() << ",";
 
     mFitter.mBicList.push_back(std::pair<std::string, double>("Noise", mFitter.bicNoise));
-    mFitter.mBicList.push_back(std::pair<std::string, double>("Exponential", mFitter.bicExponential));
-    mFitter.mBicList.push_back(std::pair<std::string, double>("Hyperbolic", mFitter.bicHyperbolic));
-    mFitter.mBicList.push_back(std::pair<std::string, double>("Beta Delta", mFitter.bicQuasiHyperbolic));
-    mFitter.mBicList.push_back(std::pair<std::string, double>("Myerson", mFitter.bicMyerson));
-    mFitter.mBicList.push_back(std::pair<std::string, double>("Rachlin", mFitter.bicRachlin));
 
     mFitter.PrepareProbabilities();
 
