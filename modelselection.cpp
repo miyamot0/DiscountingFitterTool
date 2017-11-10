@@ -46,6 +46,8 @@
 #include "modelselection.h"
 
 #include <iostream>
+#include <algorithm>
+
 #include "interpolation.h"
 
 #include "stdafx.h"
@@ -66,11 +68,16 @@ void exponential_discounting(const real_1d_array &c, const real_1d_array &x, dou
 
 void exponential_integration(double x, double xminusa, double bminusx, double &y, void *ptr)
 {
-    //QList<double> *param = (QList<double> *) ptr;
     double *param = (double *) ptr;
-    //double k = param->at(0);
     double k = param[0];
     y = exp(-exp(k)*x);
+}
+
+void exponential_integration_log10(double x, double, double, double &y, void *ptr)
+{
+    double *param = (double *) ptr;
+    double k = param[0];
+    y = exp(-exp(k)*pow(10,x));
 }
 
 void hyperbolic(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr)
@@ -80,11 +87,16 @@ void hyperbolic(const real_1d_array &c, const real_1d_array &x, double &func, vo
 
 void hyperbolic_integration(double x, double xminusa, double bminusx, double &y, void *ptr)
 {
-    //QList<double> *param = (QList<double> *) ptr;
     double *param = (double *) ptr;
-    //double k = param->at(0);
     double k = param[0];
     y = pow((1+exp(k)*x), -1);
+}
+
+void hyperbolic_integration_log10(double x, double, double, double &y, void *ptr)
+{
+    double *param = (double *) ptr;
+    double k = param[0];
+    y = pow((1+exp(k)*pow(10,x)), -1);
 }
 
 void hyperboloid_myerson(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr)
@@ -94,14 +106,20 @@ void hyperboloid_myerson(const real_1d_array &c, const real_1d_array &x, double 
 
 void hyperboloid_myerson_integration(double x, double xminusa, double bminusx, double &y, void *ptr)
 {
-    //QList<double> *param = (QList<double> *) ptr;
     double *param = (double *) ptr;
-    //double k = param->at(0);
-    //double s = param->at(1);
     double k = param[0];
     double s = param[1];
 
     y = pow((1+exp(k)*x), -s);
+}
+
+void hyperboloid_myerson_integration_log10(double x, double, double, double &y, void *ptr)
+{
+    double *param = (double *) ptr;
+    double k = param[0];
+    double s = param[1];
+
+    y = pow((1+exp(k)*pow(10,x)), -s);
 }
 
 void hyperboloid_rachlin(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr)
@@ -111,13 +129,20 @@ void hyperboloid_rachlin(const real_1d_array &c, const real_1d_array &x, double 
 
 void hyperboloid_rachlin_integration(double x, double xminusa, double bminusx, double &y, void *ptr)
 {
-    //QList<double> *param = (QList<double> *) ptr;
     double *param = (double *) ptr;
-    //double k = param->at(0);
-    //double s = param->at(1);
     double k = param[0];
     double s = param[1];
+
     y = pow((1+exp(k)*pow(x, s)), -1);
+}
+
+void hyperboloid_rachlin_integration_log10(double x, double, double, double &y, void *ptr)
+{
+    double *param = (double *) ptr;
+    double k = param[0];
+    double s = param[1];
+
+    y = pow((1+exp(k)*pow(pow(10,x), s)), -1);
 }
 
 void quasi_hyperboloid(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr)
@@ -127,13 +152,89 @@ void quasi_hyperboloid(const real_1d_array &c, const real_1d_array &x, double &f
 
 void quasi_hyperboloid_integration(double x, double xminusa, double bminusx, double &y, void *ptr)
 {
-    //QList<double> *param = (QList<double> *) ptr;
     double *param = (double *) ptr;
-    //double b = param->at(0);
-    //double d = param->at(1);
     double b = param[0];
     double d = param[1];
+
     y = b * pow(d, x);
+}
+
+void quasi_hyperboloid_integration_log10(double x, double, double, double &y, void *ptr)
+{
+    double *param = (double *) ptr;
+    double b = param[0];
+    double d = param[1];
+
+    y = b * pow(d, pow(10,x));
+}
+
+void generalized_hyperboloid_discounting(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr)
+{
+    func = pow((1 + x[0] * exp(c[0])),(-exp(c[1]) / exp(c[0])));
+}
+
+void generalized_hyperboloid_integration(double x, double, double, double &y, void *ptr)
+{
+	double *param = (double *) ptr;
+    double lnk = param[0];
+    double beta = param[1];
+
+    y = pow((1 + x * exp(lnk)),(-exp(beta) / exp(lnk)));
+}
+
+void generalized_hyperboloid_integration_log10(double x, double, double, double &y, void *ptr)
+{
+	double *param = (double *) ptr;
+    double lnk = param[0];
+    double beta = param[1];
+
+    y = pow((1 + pow(10,x) * exp(lnk)),(-exp(beta) / exp(lnk)));
+}
+
+void ebert_prelec_discounting(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr)
+{
+    func = exp(-pow((exp(c[0])*x[0]),c[1]));
+}
+
+void ebert_prelec_integration(double x, double, double, double &y, void *ptr)
+{
+	double *param = (double *) ptr;
+    double k = param[0];
+    double s = param[1];
+    y = exp(-pow((exp(k)*x), s));
+}
+
+void ebert_prelec_integration_log10(double x, double, double, double &y, void *ptr)
+{
+	double *param = (double *) ptr;
+    double k = param[0];
+    double s = param[1];
+    y = exp(-pow((exp(k)*pow(10,x)), s));
+}
+
+void bleichrodt_discounting(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr)
+{
+    func = c[2] * exp(-exp(c[0])*pow(x[0],c[1]));
+}
+
+void bleichrodt_integration(double x, double, double, double &y, void *ptr)
+{
+	double *param = (double *) ptr;
+    double k = param[0];
+    double s = param[1];
+    double beta = param[2];
+
+    y = beta * exp(-exp(k)*pow(x,s));
+}
+
+void bleichrodt_integration_log10(double x, double, double, double &y, void *ptr)
+{
+	double *param = (double *) ptr;
+    double k = param[0];
+    double s = param[1];
+    double beta = param[2];
+
+    y = beta * exp(-exp(k)*pow(pow(10,x),s));
 }
 
 void ModelSelection::SetX(const char *mString)
@@ -392,6 +493,140 @@ void ModelSelection::FitRachlin(const char *mStarts)
     fitRachlinS = (double) c[1];
 }
 
+/** Rodriguez Logue Model
+  *  @brief
+  */
+void ModelSelection::FitRodriguezLogue(const char *mStarts)
+{
+    aicRodriguezLogue = NULL;
+    bicRodriguezLogue = NULL;
+    fitRodriguezLogueK = NULL;
+    fitRodriguezLogueBeta = NULL;
+
+    SetStarts(mStarts);
+
+    lsfitcreatef(x, y, c, diffstep, state);
+    lsfitsetcond(state, epsx, maxits);
+
+    alglib::lsfitfit(state, generalized_hyperboloid_discounting);
+
+    lsfitresults(state, info, c, rep);
+
+    if ((int) GetInfo() == 2 || (int) GetInfo() == 5)
+    {
+        N = y.length();
+        SSR = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            holder = pow((1 + x[i][0] * exp(c[0])),(-exp(c[1]) / exp(c[0])));
+            SSR += pow(((double) y[i] - holder), 2);
+        }
+
+        S2 = SSR / N;
+
+        L = pow((1.0 / sqrt(2 * M_PI * S2)), N) * exp(-SSR / (S2 * 2.0));
+
+        DF = 3;
+
+        aicRodriguezLogue = (-2 * log(L)) + (2 * DF);
+        bicRodriguezLogue = -2 * log(L) + log(N) * DF;
+        fitRodriguezLogueK = (double) c[0];
+        fitRodriguezLogueBeta = (double) c[1];
+    }
+}
+
+/** Ebert Model
+  *  @brief
+  */
+void ModelSelection::FitEbertPrelec(const char *mStarts)
+{
+    aicEbertPrelec = NULL;
+    bicEbertPrelec = NULL;
+    fitEbertPrelecK = NULL;
+    fitEbertPrelecS = NULL;
+
+    SetStarts(mStarts);
+
+    lsfitcreatef(x, y, c, diffstep, state);
+    lsfitsetcond(state, epsx, maxits);
+
+    alglib::lsfitfit(state, ebert_prelec_discounting);
+
+    lsfitresults(state, info, c, rep);
+
+    if ((int) GetInfo() == 2 || (int) GetInfo() == 5)
+    {
+        N = y.length();
+        SSR = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            holder = exp(-pow((exp(c[0])*x[i][0]), c[1]));
+            SSR += pow(((double) y[i] - holder), 2);
+        }
+
+        S2 = SSR / N;
+
+        L = pow((1.0 / sqrt(2 * M_PI * S2)), N) * exp(-SSR / (S2 * 2.0));
+
+        DF = 3;
+
+        aicEbertPrelec = (-2 * log(L)) + (2 * DF);
+        bicEbertPrelec = -2 * log(L) + log(N) * DF;
+        fitEbertPrelecK = (double) c[0];
+        fitEbertPrelecS = (double) c[1];
+    }
+}
+
+/** Bleichrodt Model
+  *  @brief
+  */
+void ModelSelection::FitBleichrodt(const char *mStarts)
+{
+    aicBleichrodt = NULL;
+    bicBleichrodt = NULL;
+    fitBleichrodtK = NULL;
+    fitBleichrodtS = NULL;
+    fitBleichrodtBeta = NULL;
+
+    SetStarts(mStarts);
+
+    SetLowerUpperBounds("[Inf, Inf, 1.0]", "[-Inf, -Inf, 0.0]");
+
+    lsfitcreatef(x, y, c, diffstep, state);
+    lsfitsetbc(state, bndl, bndu);
+    lsfitsetcond(state, epsx, maxits);
+
+    alglib::lsfitfit(state, bleichrodt_discounting);
+
+    lsfitresults(state, info, c, rep);
+
+    if ((int) GetInfo() == 2 || (int) GetInfo() == 5)
+    {
+        N = y.length();
+        SSR = 0;
+
+        for (int i = 0; i < N; i++)
+        {
+            holder = c[2] * exp(-exp(c[0])*pow(x[i][0], c[1]));
+            SSR += pow(((double) y[i] - holder), 2);
+        }
+
+        S2 = SSR / N;
+
+        L = pow((1.0 / sqrt(2 * M_PI * S2)), N) * exp(-SSR / (S2 * 2.0));
+
+        DF = 4;
+
+        aicBleichrodt = (-2 * log(L)) + (2 * DF);
+        bicBleichrodt = -2 * log(L) + log(N) * DF;
+        fitBleichrodtK = (double) c[0];
+        fitBleichrodtS = (double) c[1];
+        fitBleichrodtBeta = (double) c[2];
+    }
+}
+
 double ScaleFactor(double modelBic, double noiseBic)
 {
     return exp(-0.5 * (modelBic - noiseBic));
@@ -421,9 +656,11 @@ std::string ModelSelection::formatStringResult(int value)
     }
 }
 
-std::string ModelSelection::getED50BestModel(std::string model)
+std::string ModelSelection::getED50BestModel()
 {
     std::ostringstream strs;
+
+    std::string model = mProbList[0].first;
 
     if (model.find("Exponential") != std::string::npos)
     {
@@ -439,7 +676,7 @@ std::string ModelSelection::getED50BestModel(std::string model)
 
         return strs.str();
     }
-    else if (model.find("Beta") != std::string::npos)
+    else if (model.find("Beta Delta") != std::string::npos)
     {
         double result = log(log((1/(2*fitQuasiHyperbolicBeta)))/log(fitQuasiHyperbolicDelta));
         strs << result;
@@ -460,6 +697,27 @@ std::string ModelSelection::getED50BestModel(std::string model)
 
         return strs.str();
     }
+    else if (model.find("Rodriguez") != std::string::npos)
+    {
+    	double result = getED50rodriguez();
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Ebert") != std::string::npos)
+    {
+    	double result = getED50ep();
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Bleichrodt") != std::string::npos)
+    {
+    	double result = getED50crdi();
+        strs << result;
+
+        return strs.str();
+    }
     else
     {
         strs << "NA";
@@ -468,17 +726,126 @@ std::string ModelSelection::getED50BestModel(std::string model)
     }
 }
 
-std::string ModelSelection::getAUCBestModel(std::string model)
+double ModelSelection::getED50ep () {
+    double lowDelay = 0;
+    double highDelay = x[x.rows()-1][0] * 100;
+
+    int i = 0;
+
+    while ((highDelay - lowDelay) > 0.001 && i < 100) {
+      double lowEst = ebert_prelec_plotting(fitEbertPrelecK, fitEbertPrelecS, lowDelay);
+      double midEst = ebert_prelec_plotting(fitEbertPrelecK, fitEbertPrelecS, (lowDelay+highDelay)/2);
+      double highEst = ebert_prelec_plotting(fitEbertPrelecK, fitEbertPrelecS, highDelay);
+
+      if (lowEst > 0.5 && midEst > 0.5) {
+        //Above 50% mark range
+        lowDelay  = (lowDelay+highDelay)/2;
+        highDelay = highDelay;
+
+      } else if (highEst < 0.5 && midEst < 0.5) {
+        //Below 50% mark range
+        lowDelay  = lowDelay;
+        highDelay = (lowDelay+highDelay)/2;
+
+      }
+
+      i++;
+    }
+
+    double returnValue = log((lowDelay+highDelay)/2);
+
+    return returnValue;
+}
+
+double ModelSelection::getED50crdi () {
+    double lowDelay = 0;
+    double highDelay = x[x.rows()-1][0] * 100;
+
+    int i = 0;
+
+    while ((highDelay - lowDelay) > 0.001 && i < 100) {
+      double lowEst = bleichrodt_plotting(fitBleichrodtK, fitBleichrodtS, fitBleichrodtBeta, lowDelay);
+      double midEst = bleichrodt_plotting(fitBleichrodtK, fitBleichrodtS, fitBleichrodtBeta, (lowDelay+highDelay)/2);
+      double highEst = bleichrodt_plotting(fitBleichrodtK, fitBleichrodtS, fitBleichrodtBeta, highDelay);
+
+      if (lowEst > 0.5 && midEst > 0.5) {
+        //Above 50% mark range
+        lowDelay  = (lowDelay+highDelay)/2;
+        highDelay = highDelay;
+
+      } else if (highEst < 0.5 && midEst < 0.5) {
+        //Below 50% mark range
+        lowDelay  = lowDelay;
+        highDelay = (lowDelay+highDelay)/2;
+
+      }
+
+      i++;
+    }
+
+    double returnValue = log((lowDelay+highDelay)/2);
+
+    return returnValue;
+}
+
+double ModelSelection::getED50rodriguez () {
+    double lowDelay = 0;
+    double highDelay = x[x.rows()-1][0] * 100;
+
+    int i = 0;
+
+    while ((highDelay - lowDelay) > 0.001 && i < 100) {
+      double lowEst = rodriguez_logue_plotting(fitRodriguezLogueK, fitRodriguezLogueBeta, lowDelay);
+      double midEst = rodriguez_logue_plotting(fitRodriguezLogueK, fitRodriguezLogueBeta, (lowDelay+highDelay)/2);
+      double highEst = rodriguez_logue_plotting(fitRodriguezLogueK, fitRodriguezLogueBeta, highDelay);
+
+      if (lowEst > 0.5 && midEst > 0.5) {
+        //Above 50% mark range
+        lowDelay  = (lowDelay+highDelay)/2;
+        highDelay = highDelay;
+
+      } else if (highEst < 0.5 && midEst < 0.5) {
+        //Below 50% mark range
+        lowDelay  = lowDelay;
+        highDelay = (lowDelay+highDelay)/2;
+
+      }
+
+      i++;
+    }
+
+    double returnValue = log((lowDelay+highDelay)/2);
+
+    return returnValue;
+}
+
+double ModelSelection::rodriguez_logue_plotting(double k, double s, double x)
+{
+    return pow((1 + x * exp(k)),(-exp(s) / exp(k)));
+}
+
+double ModelSelection::ebert_prelec_plotting(double k, double s, double x)
+{
+    return exp(-pow((exp(k)*x),s));
+}
+
+double ModelSelection::bleichrodt_plotting(double k, double s, double beta, double x)
+{
+    return beta * exp(-exp(k)*pow(x,s));
+}
+
+std::string ModelSelection::getLog10AUCBestModel()
 {
     std::ostringstream strs;
 
+    std::string model = mProbList[0].first;
+
     double result = -1;
-    double a = x[0][0];
-    double b = x[x.rows() - 1][0];
+    double a = log10(x[0][0] + 1);
+    double b = log10(x[x.rows() - 1][0] + 1);
 
     double mParams[2];
 
-    //QList<double> mParams;
     autogkstate s;
     double v;
     autogkreport rep;
@@ -486,7 +853,149 @@ std::string ModelSelection::getAUCBestModel(std::string model)
     if (model.find("Exponential") != std::string::npos)
     {
         mParams[0] = fitExponentialK;
-        //mParams << fitExponentialK;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, exponential_integration_log10, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Hyperbolic") != std::string::npos)
+    {
+        mParams[0] = fitHyperbolicK;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, hyperbolic_integration_log10, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Beta Delta") != std::string::npos)
+    {
+        mParams[0] = fitQuasiHyperbolicBeta;
+        mParams[1] = fitQuasiHyperbolicDelta;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, quasi_hyperboloid_integration_log10, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Myerson") != std::string::npos)
+    {
+        mParams[0] = fitMyersonK;
+        mParams[1] = fitMyersonS;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, hyperboloid_myerson_integration_log10, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Rachlin") != std::string::npos)
+    {
+        mParams[0] = fitRachlinK;
+        mParams[1] = fitRachlinS;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, hyperboloid_rachlin_integration_log10, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Rodriguez") != std::string::npos)
+    {
+        mParams[0] = fitRodriguezLogueK;
+        mParams[1] = fitRodriguezLogueBeta;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, generalized_hyperboloid_integration_log10, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Ebert") != std::string::npos)
+    {
+        mParams[0] = fitEbertPrelecK;
+        mParams[1] = fitEbertPrelecS;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, ebert_prelec_integration_log10, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Bleichrodt") != std::string::npos)
+    {
+        mParams[0] = fitBleichrodtK;
+        mParams[1] = fitBleichrodtS;
+        mParams[1] = fitBleichrodtBeta;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, bleichrodt_integration_log10, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else
+    {
+        strs << "NA";
+
+        return strs.str();
+    }
+}
+
+std::string ModelSelection::getAUCBestModel()
+{
+    std::ostringstream strs;
+
+    std::string model = mProbList[0].first;
+
+    double result = -1;
+    double a = x[0][0];
+    double b = x[x.rows() - 1][0];
+
+    double mParams[2];
+
+    autogkstate s;
+    double v;
+    autogkreport rep;
+
+    if (model.find("Exponential") != std::string::npos)
+    {
+        mParams[0] = fitExponentialK;
 
         autogksmooth(a, b, s);
         alglib::autogkintegrate(s, exponential_integration, &mParams);
@@ -501,7 +1010,6 @@ std::string ModelSelection::getAUCBestModel(std::string model)
     else if (model.find("Hyperbolic") != std::string::npos)
     {
         mParams[0] = fitHyperbolicK;
-        //mParams << fitHyperbolicK;
 
         autogksmooth(a, b, s);
         alglib::autogkintegrate(s, hyperbolic_integration, &mParams);
@@ -513,13 +1021,10 @@ std::string ModelSelection::getAUCBestModel(std::string model)
 
         return strs.str();
     }
-    else if (model.find("Beta") != std::string::npos)
+    else if (model.find("Beta Delta") != std::string::npos)
     {
-        mParams[1] = fitQuasiHyperbolicBeta;
-        mParams[2] = fitQuasiHyperbolicDelta;
-
-        //mParams << fitQuasiHyperbolicBeta;
-        //mParams << fitQuasiHyperbolicDelta;
+        mParams[0] = fitQuasiHyperbolicBeta;
+        mParams[1] = fitQuasiHyperbolicDelta;
 
         autogksmooth(a, b, s);
         alglib::autogkintegrate(s, quasi_hyperboloid_integration, &mParams);
@@ -533,11 +1038,8 @@ std::string ModelSelection::getAUCBestModel(std::string model)
     }
     else if (model.find("Myerson") != std::string::npos)
     {
-        mParams[1] = fitMyersonK;
-        mParams[2] = fitMyersonS;
-
-        //mParams << fitMyersonK;
-        //mParams << fitMyersonS;
+        mParams[0] = fitMyersonK;
+        mParams[1] = fitMyersonS;
 
         autogksmooth(a, b, s);
         alglib::autogkintegrate(s, hyperboloid_myerson_integration, &mParams);
@@ -551,14 +1053,57 @@ std::string ModelSelection::getAUCBestModel(std::string model)
     }
     else if (model.find("Rachlin") != std::string::npos)
     {
-        mParams[1] = fitRachlinK;
-        mParams[2] = fitRachlinS;
-
-        //mParams << fitRachlinK;
-        //mParams << fitRachlinS;
+        mParams[0] = fitRachlinK;
+        mParams[1] = fitRachlinS;
 
         autogksmooth(a, b, s);
         alglib::autogkintegrate(s, hyperboloid_rachlin_integration, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Rodriguez") != std::string::npos)
+    {
+        mParams[0] = fitRodriguezLogueK;
+        mParams[1] = fitRodriguezLogueBeta;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, generalized_hyperboloid_integration, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Ebert") != std::string::npos)
+    {
+        mParams[0] = fitEbertPrelecK;
+        mParams[1] = fitEbertPrelecS;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, ebert_prelec_integration, &mParams);
+        autogkresults(s, v, rep);
+
+        result = double(v) / (b - a);
+
+        strs << result;
+
+        return strs.str();
+    }
+    else if (model.find("Bleichrodt") != std::string::npos)
+    {
+        mParams[0] = fitBleichrodtK;
+        mParams[1] = fitBleichrodtS;
+        mParams[1] = fitBleichrodtBeta;
+
+        autogksmooth(a, b, s);
+        alglib::autogkintegrate(s, bleichrodt_integration, &mParams);
         autogkresults(s, v, rep);
 
         result = double(v) / (b - a);
@@ -573,11 +1118,6 @@ std::string ModelSelection::getAUCBestModel(std::string model)
 
         return strs.str();
     }
-
-    //autogksmooth(a, b, s);
-    //alglib::autogkintegrate(s, hyperbolic_integration, &mParams);
-    //autogkresults(s, v, rep);
-    //return QString::number(double(v));
 }
 
 void ModelSelection::InitializeDefaults()
@@ -600,6 +1140,12 @@ void ModelSelection::InitializeDefaults()
     AVE = 0;
 }
 
+struct sort_pred {
+    bool operator()(const std::pair<std::string, double> &left, const std::pair<std::string, double> &right) {
+        return left.second > right.second;
+    }
+};
+
 void ModelSelection::PrepareProbabilities()
 {
     bfNoise = ScaleFactor(NoiseBIC, NoiseBIC);
@@ -608,12 +1154,15 @@ void ModelSelection::PrepareProbabilities()
     bfQuasiHyperbolic = -1;
     bfMyerson = -1;
     bfRachlin = -1;
+    bfRodriguezLogue = -1;
+    bfEbertPrelec = -1;
+    bfBleichrodt = -1;
 
     sumBayesFactors = 0;
 
     /** Set up BF's
       */
-    for (int i=0; i<mBicList.size(); i++)
+    for (int i = 0; i < (int) mBicList.size(); i++)
     {
         std::string mModel = mBicList[i].first;
 
@@ -642,6 +1191,21 @@ void ModelSelection::PrepareProbabilities()
             bfRachlin = ScaleFactor(mBicList[i].second, NoiseBIC);
             sumBayesFactors = sumBayesFactors + bfRachlin;
         }
+        else if (mModel.find("RodriguezLogue") != std::string::npos)
+        {
+            bfRodriguezLogue = ScaleFactor(mBicList[i].second, NoiseBIC);
+            sumBayesFactors = sumBayesFactors + bfRodriguezLogue;
+        }
+        else if (mModel.find("EbertPrelec") != std::string::npos)
+        {
+            bfEbertPrelec = ScaleFactor(mBicList[i].second, NoiseBIC);
+            sumBayesFactors = sumBayesFactors + bfEbertPrelec;
+        }
+        else if (mModel.find("Bleichrodt") != std::string::npos)
+        {
+            bfBleichrodt = ScaleFactor(mBicList[i].second, NoiseBIC);
+            sumBayesFactors = sumBayesFactors + bfBleichrodt;
+        }
     }
 
     probsNoise = bfNoise/sumBayesFactors;
@@ -650,11 +1214,14 @@ void ModelSelection::PrepareProbabilities()
     probsQuasiHyperbolic = -1;
     probsMyerson = -1;
     probsRachlin = -1;
+    probsRodriguezLogue = -1;
+    probsEbertPrelec = -1;
+    probsBleichrodt = -1;
 
     mProbList.clear();
     mProbList.push_back(std::pair<std::string, double>("Noise Model", probsNoise));
 
-    for (int i=0; i<mBicList.size(); i++)
+    for (int i = 0; i < (int) mBicList.size(); i++)
     {
         std::string mModel = mBicList[i].first;
 
@@ -683,7 +1250,120 @@ void ModelSelection::PrepareProbabilities()
             probsRachlin = bfRachlin/sumBayesFactors;
             mProbList.push_back(std::pair<std::string, double>("Rachlin Model", probsRachlin));
         }
+        else if (mModel.find("RodriguezLogue") != std::string::npos)
+        {
+            probsRodriguezLogue = bfRodriguezLogue/sumBayesFactors;
+            mProbList.push_back(std::pair<std::string, double>("Rodriguez Logue Model", probsRodriguezLogue));
+        }
+        else if (mModel.find("EbertPrelec") != std::string::npos)
+        {
+            probsEbertPrelec = bfEbertPrelec/sumBayesFactors;
+            mProbList.push_back(std::pair<std::string, double>("Ebert Prelec Model", probsEbertPrelec));
+        }
+        else if (mModel.find("Bleichrodt") != std::string::npos)
+        {
+            probsBleichrodt = bfBleichrodt/sumBayesFactors;
+            mProbList.push_back(std::pair<std::string, double>("Bleichrodt Model", probsBleichrodt));
+        }
     }
+
+    std::sort(mProbList.begin(), mProbList.end(), sort_pred());
+}
+
+double ModelSelection::getErrorExponential(double lnK)
+{
+    leastSquaresError = 0;
+
+    for (int i=0; i<y.length(); i++)
+    {
+        leastSquaresError = leastSquaresError + pow((y[i] - (exp(-exp(lnK)*x[i][0]))), 2);
+    }
+
+    return leastSquaresError;
+}
+
+double ModelSelection::getErrorHyperbolic(double lnK)
+{
+    leastSquaresError = 0;
+
+    for (int i=0; i<y.length(); i++)
+    {
+        leastSquaresError = leastSquaresError + pow((y[i] - (pow((1+exp(lnK)*x[i][0]), -1))), 2);
+    }
+
+    return leastSquaresError;
+}
+
+double ModelSelection::getErrorQuasiHyperbolic(double beta, double delta)
+{
+    leastSquaresError = 0;
+
+    for (int i=0; i<y.length(); i++)
+    {
+        leastSquaresError = leastSquaresError + pow((y[i] - (pow((beta*delta),x[i][0]))), 2);
+    }
+
+    return leastSquaresError;
+}
+
+double ModelSelection::getErrorGreenMyerson(double lnK, double s)
+{
+    leastSquaresError = 0;
+
+    for (int i=0; i<y.length(); i++)
+    {
+        leastSquaresError = leastSquaresError + pow((y[i] - (pow((1+exp(lnK)*x[i][0]), (-s)))), 2);
+    }
+
+    return leastSquaresError;
+}
+
+double ModelSelection::getErrorRachlin(double lnK, double s)
+{
+    leastSquaresError = 0;
+
+    for (int i=0; i<y.length(); i++)
+    {
+        leastSquaresError = leastSquaresError + pow((y[i] - pow((1+exp(lnK)*(pow(x[i][0],s))),(-1))), 2);
+    }
+
+    return leastSquaresError;
+}
+
+double ModelSelection::getErrorRodriguezLogue(double lnK, double beta)
+{
+    leastSquaresError = 0;
+
+    for (int i=0; i<y.length(); i++)
+    {
+        leastSquaresError = leastSquaresError + pow((y[i] - (pow((1 + x[i][0] * exp(lnK)),(-exp(beta) / exp(lnK))))), 2);
+    }
+
+    return leastSquaresError;
+}
+
+double ModelSelection::getErrorEbertPrelec(double lnK, double s)
+{
+    leastSquaresError = 0;
+
+    for (int i=0; i<y.length(); i++)
+    {
+        leastSquaresError = leastSquaresError + pow((y[i] - exp(-pow((exp(lnK)*x[i][0]),s))), 2);
+    }
+
+    return leastSquaresError;
+}
+
+double ModelSelection::getErrorBleichrodt(double lnK, double s, double beta)
+{
+    leastSquaresError = 0;
+
+    for (int i=0; i<y.length(); i++)
+    {
+        leastSquaresError = leastSquaresError + pow((y[i] - (beta*exp(-(exp(lnK)*pow(x[i][0],s))))), 2);
+    }
+
+    return leastSquaresError;
 }
 
 ModelSelection::ModelSelection()
