@@ -71,10 +71,29 @@ public:
     lsfitstate GetState();
     ae_int_t GetInfo();
     lsfitreport GetReport();
+
     double GetNoiseMean();
+    double getED50ep();
+    double getED50crdi();
+    double getED50rodriguez();
+
+    double rodriguez_logue_plotting(double k, double s, double x);
+    double ebert_prelec_plotting(double k, double s, double x);
+    double bleichrodt_plotting(double k, double s, double beta, double x);
+
     std::string formatStringResult(int value);
-    std::string getED50BestModel(std::string model);
-    std::string getAUCBestModel(std::string model);
+    std::string getED50BestModel();
+    std::string getAUCBestModel();
+    std::string getLog10AUCBestModel();
+
+    double getErrorExponential(double lnK);
+    double getErrorHyperbolic(double lnK);
+    double getErrorQuasiHyperbolic(double beta, double delta);
+    double getErrorGreenMyerson(double lnK, double s);
+    double getErrorRachlin(double lnK, double s);
+    double getErrorRodriguezLogue(double lnK, double beta);
+    double getErrorEbertPrelec(double lnK, double s);
+    double getErrorBleichrodt(double lnK, double s, double beta);
 
     void FitNoise();
     void FitExponential(const char *mStarts);
@@ -82,6 +101,9 @@ public:
     void FitQuasiHyperbolic(const char *mStarts);
     void FitMyerson(const char *mStarts);
     void FitRachlin(const char *mStarts);
+    void FitRodriguezLogue(const char *mStarts);
+    void FitEbertPrelec(const char *mStarts);
+    void FitBleichrodt(const char *mStarts);
 
     void PrepareProbabilities();
 
@@ -92,9 +114,6 @@ public:
     std::vector<std::pair<std::string, double> > mBicList;
     std::vector<std::pair<std::string, double> > mProbList;
 
-    //QList<QPair<QString, double>> mBicList;
-    //QList<QPair<QString, double>> mProbList;
-
     /** AICs
      *
      */
@@ -104,6 +123,9 @@ public:
     double aicQuasiHyperbolic;
     double aicMyerson;
     double aicRachlin;
+    double aicRodriguezLogue;
+    double aicEbertPrelec;
+    double aicBleichrodt;
 
     /** BICs
      *
@@ -114,6 +136,9 @@ public:
     double bicQuasiHyperbolic;
     double bicMyerson;
     double bicRachlin;
+    double bicRodriguezLogue;
+    double bicEbertPrelec;
+    double bicBleichrodt;
 
     /** Bayes Factors
       *
@@ -124,6 +149,9 @@ public:
     double bfQuasiHyperbolic;
     double bfMyerson;
     double bfRachlin;
+    double bfRodriguezLogue;
+    double bfEbertPrelec;
+    double bfBleichrodt;
 
     /** Probs
       *
@@ -134,6 +162,9 @@ public:
     double probsQuasiHyperbolic;
     double probsMyerson;
     double probsRachlin;
+    double probsRodriguezLogue;
+    double probsEbertPrelec;
+    double probsBleichrodt;
 
     /** Fits
       *
@@ -146,12 +177,29 @@ public:
     double fitMyersonS;
     double fitRachlinK;
     double fitRachlinS;
+    double fitRodriguezLogueK;
+    double fitRodriguezLogueBeta;
+    double fitEbertPrelecK;
+    double fitEbertPrelecS;
+    double fitBleichrodtBeta;
+    double fitBleichrodtK;
+    double fitBleichrodtS;
 
     double AVE;
     double SSR;
     double sumErr;
     double N;
     double S2;
+
+    /** BIC Stuff
+      *
+      */
+    double L;
+    double DF;
+    double PROJ;
+    double holder;
+
+    double sumBayesFactors;
 
 private:
     real_2d_array x;
@@ -169,15 +217,7 @@ private:
     double epsx;
     double diffstep;
 
-    /** BIC Stuff
-      *
-      */
-    double L;
-    double DF;
-    double PROJ;
-    double holder;
-
-    double sumBayesFactors;
+    double leastSquaresError;
 };
 
 #endif // MODELSELECTION_H
