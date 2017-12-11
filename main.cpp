@@ -623,7 +623,9 @@ int main(int argc, char *argv[])
 
     std::sort(provisionalValues.twoParamStartingValueArray, provisionalValues.twoParamStartingValueArray + 1000);
 
-    startWriter << "[" << provisionalValues.twoParamStartingValueArray[0].p1 << "," << provisionalValues.twoParamStartingValueArray[0].p2 << "]";
+    startWriter << "[" << provisionalValues.twoParamStartingValueArray[0].p1 << "," 
+	     	<< provisionalValues.twoParamStartingValueArray[0].p2 << ","
+	     	<< provisionalValues.twoParamStartingValueArray[0].p3 << "]";
 
     /*
      * Perform fitting with start values
